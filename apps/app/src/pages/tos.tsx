@@ -14,7 +14,7 @@ export default function tos() {
       <section className="flex justify-left items-center border rounded-lg my-10 mx-20">
         <div className="flex m-8 flex-col">
           <div className="mb-2 text-3xl font-bold">Table of Contents</div>
-          <ul className="mx-5 mb-5 list-decimal">
+          <ul className="mx-5 mb-32 list-decimal">
             <li>
               <Link className="text-blue-400" href="#Agreement">
                 Agreement to our legal terms
