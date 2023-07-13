@@ -1,4 +1,8 @@
+import { Disclosure } from '@headlessui/react'
+import { MenuIcon, XIcon } from '@heroicons/react/outline'
 import { Inter } from '@next/font/google'
+import clsx from 'clsx'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -20,7 +24,6 @@ const inter700 = Inter({
 
 const Navbar: FC = () => {
   const { t } = useTranslation('common')
-  const { pathname } = useRouter()
   const { isAuthenticated, currentUser } = useAppPersistStore()
   const [auth, setAuth] = useState<boolean>(false)
 
@@ -32,87 +35,135 @@ const Navbar: FC = () => {
     }
   }, [currentUser, isAuthenticated])
 
-  return (
-    <div className="sticky z-20 top-0 flex justify-between bg-white bg-opacity-80 max-h-[100vh] border-b-2 border-gray-100">
-      <div className="flex items-center">
-        <a href="/">
-          <img
-            className="m-5 h-10 w-10"
-            src="https://bcharity.vercel.app/logo.jpg "
-            alt="BCharity logo"
-          ></img>
-        </a>
-        <div
-          className={`m-5 text-2xl text-violet-800 tracking-wider ${inter500.className}`}
-        >
-          BCharity
-        </div>
-      </div>
-      <div className="flex">
-        <div className="flex w-[60] justify-around items-center">
-          <a href="/causes">
-            <button>
-              <div
-                className={`text-lg p-3 rounded-lg hover:bg-gray-100 tracking-wider ${
-                  pathname == '/causes'
-                    ? 'text-purple-500 bg-white'
-                    : 'text-black'
-                } ${inter500.className}`}
-              >
-                CAUSES
-              </div>
-            </button>
-          </a>
-          <a href="/volunteers">
-            <button>
-              <div
-                className={`text-lg p-3 rounded-lg hover:bg-gray-100 tracking-wider ${
-                  pathname == '/volunteers'
-                    ? 'text-purple-500 bg-white'
-                    : 'text-black'
-                } ${inter500.className}`}
-              >
-                VOLUNTEERS
-              </div>
-            </button>
-          </a>
-          <a href="/organizations">
-            <button>
-              <div
-                className={`text-lg p-3 rounded-lg hover:bg-gray-100 tracking-wider ${
-                  pathname == '/organizations'
-                    ? 'text-purple-500 bg-white'
-                    : 'text-black'
-                } ${inter500.className} ${auth ? '' : 'mr-10'}`}
-              >
-                ORGANIZATIONS
-              </div>
-            </button>
-          </a>
-          {auth && (
-            <a href="/dashboard">
-              <button>
-                <div
-                  className={`text-lg p-3 rounded-lg mr-10 hover:bg-gray-100 tracking-wider ${
-                    pathname == '/dashboard'
-                      ? 'text-purple-500 bg-white'
-                      : 'text-black'
-                  } ${inter500.className}`}
-                >
-                  DASHBOARD
-                </div>
-              </button>
-            </a>
+  interface NavItemProps {
+    url: string
+    name: string
+    current: boolean
+  }
+
+  const NavItem = ({ url, name, current }: NavItemProps) => {
+    return (
+      <Link href={url} aria-current={current ? 'page' : undefined}>
+        <Disclosure.Button
+          className={clsx(
+            'text-lg p-3 rounded-lg hover:bg-gray-100 tracking-wider w-full md:px-3',
+            {
+              'text-purple-500 bg-white': current,
+              'text-black': !current
+            },
+            `${inter500.className}`
           )}
-        </div>
-        <div className="my-auto mr-10">
-          <TranslateButton />
-        </div>
-        <div className="my-auto mr-10">
-          <MenuItems />
-        </div>
-      </div>
-    </div>
+        >
+          {name}
+        </Disclosure.Button>
+      </Link>
+    )
+  }
+
+  const NavItems = () => {
+    const { pathname } = useRouter()
+
+    return (
+      <>
+        <NavItem
+          url="/causes"
+          name={t('CAUSES')}
+          current={pathname == '/causes'}
+        />
+
+        <NavItem
+          url="/volunteers"
+          name={t('VOLUNTEERS')}
+          current={pathname == '/volunteers'}
+        />
+
+        <NavItem
+          url="/organizations"
+          name={t('ORGANIZATIONS')}
+          current={pathname == '/organizations'}
+        />
+
+        {auth && (
+          <NavItem
+            url="/dashboard"
+            name={t('DASHBOARD')}
+            current={pathname == '/dashboard'}
+          />
+        )}
+      </>
+    )
+  }
+
+  return (
+    <Disclosure
+      as="header"
+      className="divider sticky top-0 z-10 w-full bg-white bg-opacity-80 dark:bg-black"
+    >
+      {({ open }) => (
+        <>
+          <div className="container mx-auto max-w-screen-xl px-5">
+            <div className="relative flex h-14 items-center justify-between sm:h-16">
+              <div className="flex items-center justify-start">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md text-gray-500 focus:outline-none md:hidden">
+                  {open ? (
+                    <XIcon className="block w-6 h-6" aria-hidden="true" />
+                  ) : (
+                    <MenuIcon className="block w-6 h-6" aria-hidden="true" />
+                  )}
+                </Disclosure.Button>
+                <Link href="/" className="hidden md:block">
+                  <div className="inline-flex flex-grow justify-between items-center font-bold">
+                    <div className="text-3xl font-black">
+                      <img
+                        className="mx-5 h-10 w-10"
+                        src="/logo.jpg"
+                        alt="Logo"
+                      />
+                    </div>
+                    <span
+                      className={`mt-1 text-2xl text-violet-800 tracking-wider ${inter500.className}`}
+                    >
+                      BCharity
+                    </span>
+                  </div>
+                </Link>
+                <div className="hidden sm:ml-6 md:block">
+                  <div className="flex items-center space-x-4">
+                    <NavItems />
+                  </div>
+                </div>
+              </div>
+              <Link href="/" className={clsx('md:hidden')}>
+                <div className="inline-flex flex-grow justify-between items-center font-bold">
+                  <div className="text-3xl font-black">
+                    <img
+                      className="mx-5 h-10 w-10"
+                      src="/logo.jpg"
+                      alt="Logo"
+                    />
+                  </div>
+                  <span
+                    className={`mt-1 text-2xl text-violet-800 tracking-wider ${inter500.className}`}
+                  >
+                    BCharity
+                  </span>
+                </div>
+              </Link>
+              <div className="flex items-center gap-4">
+                <TranslateButton />
+                <MenuItems />
+              </div>
+            </div>
+          </div>
+
+          <Disclosure.Panel className="md:hidden">
+            <div className="m-3">
+              <NavItems />
+            </div>
+          </Disclosure.Panel>
+        </>
+      )}
+    </Disclosure>
   )
 }
 
