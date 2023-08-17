@@ -9,7 +9,6 @@ import React, { FC, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { object, string } from 'zod'
 
-import { checkAuth } from '@/lib/lens-protocol'
 import createProfile, { isValidHandle } from '@/lib/lens-protocol/createProfile'
 import { useAppPersistStore } from '@/store/app'
 
@@ -51,8 +50,6 @@ const Create: FC<Props> = ({ isModal = false }) => {
         const username = handle.toLowerCase()
         if (isValidHandle(username)) {
           try {
-            if (!currentUser) throw Error(e('profile-null'))
-            await checkAuth(currentUser.ownedBy)
             const result = await createProfile(username)
             if (!isRelayerResult(result)) {
               setErrorMessage(`${result.reason}`)
